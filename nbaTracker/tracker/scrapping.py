@@ -2,8 +2,10 @@
 from bs4 import BeautifulSoup as bs
 
 from selenium.webdriver import Chrome
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
+import time
 import os
 import ssl
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
@@ -12,136 +14,153 @@ if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
 
 
 official_nba_url = "https://es.global.nba.com/"
+official_nba_standings_url = "https://www.nba.com/standings?GroupBy=div&Season=2021-22&Section=overall"
+official_nba_stats_url = "https://www.nba.com/stats/players/traditional/?sort=PLAYER_NAME&dir=-1"
 nba_teams_url = official_nba_url + "teamindex/"
 
-
 chrome_options = Options()
+
+
+def scrap_div_teams(teams, divisions, division_name, div_table, conference_name):
+    division_teams = div_table.find("tbody").find_all("tr")
+
+    for t in division_teams:
+        team_data = t.find_all("td")
+
+        title = team_data[0].find(
+            "div", class_="ml-2").text.split(" ")
+
+        print(title)
+
+        team_name = title[0] + " " + title[1] + " " + \
+            (title[2] if len(title) == 4 else "")
+        team_abbreviation = title[-2]
+        print(team_abbreviation + "- " + team_name)
+
+        team_img = team_data[0].find("img").attrs["src"]
+
+        team_wins = team_data[1].text
+        team_losses = team_data[2].text
+
+        print("{}, {}".format(team_wins, team_losses))
+        teams.append({
+            "name": team_name,
+            "abbreviation": team_abbreviation,
+            "img_url": team_img,
+            "wins": team_wins,
+            "losses": team_losses,
+            "division": division_name,
+            "conference": conference_name
+        })
 
 
 def scrap_teams():
     with Chrome(options=chrome_options) as browser:
 
-        browser.get(nba_teams_url)
+        print("\nScrapping teams...")
+        browser.get(official_nba_standings_url)
         teams_soup = bs(browser.page_source, "html.parser")
 
         teams = []
+        conferences = []
+        divisions = []
 
-        conferences = teams_soup.find(
-            "div", class_="sib-list sib-team-list").findChildren("div", recursive=False)
+        division_titles = teams_soup.find_all("h5", class_="h5")
+        print(division_titles)
+        division_tables = teams_soup.find_all(
+            "div", class_="MockStatsTable_statsTable__2edDg")
 
-        print(conferences)
+        conference_name = "Eastern"
+        conferences.append(conference_name)
+        print(conference_name)
+        for d in range(0, 3):
+            division_name = division_titles[d].text.split(" Division")[
+                0].strip()
+            divisions.append({"division": division_name,
+                              "conference": conference_name})
 
-        for c in conferences:
-            conference_name = c.find("div").find("span").text.split(
-                "Conferencia")[0].strip()
-            print(conference_name)
+            scrap_div_teams(teams, divisions, division_name,
+                            division_tables[d], conference_name)
 
-            divisions = c.find_all("div", class_="division")
+        conference_name = "Western"
+        conferences.append(conference_name)
+        print(conference_name)
+        for d in range(3, 6):
+            division_name = division_titles[d].text.split(" Division")[
+                0].strip()
+            divisions.append({"division": division_name,
+                              "conference": conference_name})
 
-            for d in divisions:
-                division_name = d.find("div", class_="division-label").text
-                print(division_name)
+            scrap_div_teams(teams, divisions, division_name,
+                            division_tables[d], conference_name)
 
-                team_banners = d.find_all("div", class_="team")
-
-                for banner in team_banners:
-                    team_img = official_nba_url + \
-                        banner.find("img", class_="team-img").attrs["src"]
-                    team_name = banner.find("span", class_="name").text
-
-                    team_url = official_nba_url + \
-                        banner.find(
-                            "a", class_="ng-isolate-scope").attrs["href"]
-
-                    browser.get(team_url)
-                    team_soup = bs(browser.page_source, "html.parser")
-
-                    team_wins_losses = team_soup.find("div", class_="row").find(
-                        "div", class_="hidden-sm nba-team-info-right").text
-
-                    team_wins = team_wins_losses.split("V")[0].strip()
-                    team_losses = team_wins_losses.split(
-                        "-")[1].split("D")[0].strip()
-
-                    teams.append({
-                        "name": team_name,
-                        "img_url": team_img,
-                        "wins": team_wins,
-                        "losses": team_losses,
-                        "division": division_name,
-                        "conference": conference_name
-                    })
-
-        return teams
+        return teams, conferences, divisions
 
 
 def scrap_players():
     with Chrome(options=chrome_options) as browser:
-        browser.implicitly_wait(1000)
 
-        browser.get(nba_teams_url)
+        print("\nScrapping players...")
+
+        browser.get(official_nba_stats_url)
+
+        el = browser.find_element(
+            By.CLASS_NAME, 'stats-table-pagination__select')
+        for option in el.find_elements(By.TAG_NAME, 'option'):
+            if option.text == 'All':
+                option.click()  # select() in earlier versions of webdriver
+                break
+
         teams_soup = bs(browser.page_source, "html.parser")
 
         players = []
 
-        teams = teams_soup.find_all("div", class_="team")
+        player_rows = teams_soup.find(
+            "div", class_="nba-stat-table__overflow").find("tbody").find_all("tr")
 
-        for t in teams:
-            team_name = t.find("span", class_="name").text
-            print("team: " + team_name)
+        for pw in player_rows:
+            player_data = pw.find_all("td")
 
-            team_roster_url = official_nba_url + \
-                t.find("a", string="Plantilla").attrs["data-ng-href"]
-            browser.get(team_roster_url)
-            roaster_soup = bs(browser.page_source, "html.parser")
+            player_name = player_data[1].text.strip()
+            team_abbr = player_data[2].text.strip()
 
-            roaster_players = roaster_soup.find(
-                "div", class_="nba-stat-table__overflow").find("tbody").find_all("tr")
+            print(team_abbr + " - " + player_name)
 
-            for p in roaster_players:
-                player_name = "".join([n.text.strip() + " " for n in p.find(
-                    "a", class_="player-name").find_all("span")])
-                print("player: " + player_name)
-                player_img = p.find("img", class_="player-img").attrs["src"]
+            player_mpp = float(player_data[7].text.strip())
+            player_ppp = float(player_data[8].text.strip())
+            player_fg = float(player_data[11].text.strip())
+            player_3p = float(player_data[14].text.strip())
+            player_ft = float(player_data[17].text.strip())
+            player_rpp = float(player_data[20].text.strip())
+            player_app = float(player_data[21].text.strip())
+            player_topp = float(player_data[22].text.strip())
+            player_spp = float(player_data[23].text.strip())
+            player_bpp = float(player_data[24].text.strip())
+            player_plus_minus = float(player_data[-1].text.strip())
 
-                player_data = p.find_all("td")
+            print("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}".format(
+                player_mpp, player_ppp, player_fg, player_3p, player_ft, player_rpp, player_app, player_topp, player_spp, player_bpp, player_plus_minus))
 
-                player_position = player_data[1].text
-                player_number = player_data[4].text
+            players.append({
+                "name": player_name,
+                "min_per_game": player_mpp,
+                "pts_per_game": player_ppp,
+                "field_goal": player_fg,
+                "three_p_ptg": player_3p,
+                "ft_ptg": player_ft,
+                "reb_per_game": player_rpp,
+                "ast_per_game": player_app,
+                "tov_per_game": player_topp,
+                "stl_per_game": player_spp,
+                "blk_per_game": player_bpp,
+                "plus_minus": player_plus_minus,
+                "team": team_abbr
+            })
 
-                player_url = official_nba_url + p.find("a").attrs["href"]
-
-                browser.get(player_url)
-                player_soup = bs(browser.page_source, "html.parser")
-
-                player_stats = player_soup.find(
-                    "tr", class_="ng-scope").find_all("td")
-                player_mpp = player_stats[4].text
-                player_fg = player_stats[5].text
-                player_repp = player_stats[10].text
-                player_app = player_stats[11].text
-                player_ropp = player_stats[12].text
-                player_bpp = player_stats[13].text
-                player_ppp = player_stats[16].text
-
-                players.append({
-                    "name": player_name,
-                    "img_url": player_img,
-                    "position": player_position,
-                    "number": player_number,
-                    "min_per_game": player_mpp,
-                    "pts_per_game": player_ppp,
-                    "field_goal": player_fg,
-                    "reb_per_game": player_repp,
-                    "ast_per_game": player_app,
-                    "rob_per_game": player_ropp,
-                    "blk_per_game": player_bpp,
-                    "team": team_name
-                })
+        return players
 
 
 if __name__ == "__main__":
-    print("scrapping")
+    print("testing scrapping locally...")
     scrap_teams()
-
-    scrap_players()
+    # scrap_players()

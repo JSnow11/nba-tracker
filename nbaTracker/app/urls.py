@@ -15,11 +15,23 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+
 
 from frontend import views as feViews
+from tracker import views as apiViews
+
+router = routers.DefaultRouter()
+router.register(r'teams', apiViews.TeamViewSet, 'teams')
+router.register(r'players', apiViews.PlayerViewSet, 'players')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/populate', apiViews.PopulateDB.as_view()),
+    path('api/', include(router.urls)),
+    path('auth/',
+         include('rest_framework.urls', namespace='rest_framework')),
+
     url('', feViews.index)
 ]
