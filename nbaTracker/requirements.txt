@@ -1,0 +1,6 @@
+Django==3.2.8
+django-utils==0.0.2
+djangorestframework==3.13.1
+django-cors-headers==3.10.1
+django-rest-swagger==2.2.0
+sqlparse==0.2.4
