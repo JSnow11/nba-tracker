@@ -30,11 +30,11 @@ def populate_database():
 
 
 def delete_tables():
-    Conference.objects.all().delete()
-    Division.objects.all().delete()
-    Team.objects.all().delete()
     Player.objects.all().delete()
     Tag.objects.all().delete()
+    Team.objects.all().delete()
+    Division.objects.all().delete()
+    Conference.objects.all().delete()
 
 
 def populate_tags():
@@ -96,7 +96,7 @@ def add_player_tags():
         if(player.pts_per_game > 10 and player.ast_per_game > 5 and player.plus_minus > 10):
             player.tags.add("STAR")
 
-    player.save()
+        player.save()
 
 
 def populate_players(players):
@@ -119,7 +119,6 @@ def populate_players(players):
             team=team
         ))
     Player.objects.bulk_create(create_queue)
-
-    add_player_tags()
-
     print("Players inserted: {}".format(len(create_queue)))
+    add_player_tags()
+    print("Added player tags")

@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 
 # Create your models here.
@@ -41,7 +42,7 @@ class Tag(models.Model):
 
 
 class Player(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     img_url = models.CharField(max_length=100)
     position = models.CharField(max_length=4)

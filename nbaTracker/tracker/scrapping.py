@@ -32,8 +32,8 @@ def scrap_div_teams(teams, divisions, division_name, div_table, conference_name)
 
         print(title)
 
-        team_name = title[0] + " " + title[1] + " " + \
-            (title[2] if len(title) == 4 else "")
+        team_name = title[0] + " " + title[1] +  \
+            (" " + title[2] if len(title) == 5 else "")
         team_abbreviation = title[-2]
         print(team_abbreviation + "- " + team_name)
 

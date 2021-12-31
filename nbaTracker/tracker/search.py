@@ -10,7 +10,7 @@ from whoosh.qparser import QueryParser
 
 from whoosh.qparser.default import MultifieldParser
 
-index = "search_index"
+index = "tracker/search_index"
 
 
 def index_items():
@@ -71,30 +71,35 @@ def index_players():
 
     for player in players:
         writer.add_document(name=player.name, team_abbr=player.team.abbreviation,
-                            team=player.team.name, tags=player.tags)
+                            team=player.team.name, tags="".join([t.name for t in player.tags.all()]))
     writer.commit()
     print("{} players indexed".format(ix.doc_count()))
     return ix.doc_count()
 
 
-def search_players(keywords, callback):
-    ix = open_dir(index + "/players")
-    with ix.searcher() as searcher:
-        print("Searching for players, keywords: {}".format(keywords))
-        query = MultifieldParser(
-            ["name", "team_abbr", "team", "tags"], ix.schema).parse(str(keywords))
-
-        results = searcher.search(query, limit=None)
-
-        print(results)
-        callback(results)
-
-
-def search_teams(keywords, callback):
+def search_teams(keywords):
     ix = open_dir(index + "/teams")
     with ix.searcher() as searcher:
         print("Searching for teams, keywords: {}".format(keywords))
         query = MultifieldParser(
             ["name", "abbreviation", "division", "conference"], ix.schema).parse(str(keywords))
         results = searcher.search(query, limit=None)
-        callback(results)
+        if(len(results) > 0):
+            team_abbreviations = [r["abbreviation"] for r in results]
+            return Team.objects.filter(abbreviation__in=team_abbreviations)
+        else:
+            return []
+
+
+def search_players(keywords):
+    ix = open_dir(index + "/players")
+    with ix.searcher() as searcher:
+        print("Searching for players, keywords: {}".format(keywords))
+        query = MultifieldParser(
+            ["name", "team_abbr", "team", "tags"], ix.schema).parse(str(keywords))
+        results = searcher.search(query, limit=None)
+        if(len(results) > 0):
+            player_names = [r["name"] for r in results]
+            return Player.objects.filter(name__in=player_names)
+        else:
+            return []
