@@ -16,7 +16,8 @@ class Division(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     logo_url = models.CharField(max_length=100, unique=True)
-    abbreviation = models.CharField(max_length=3)
+    abbreviation = models.CharField(
+        max_length=3, unique=True, primary_key=True)
 
     wins = models.IntegerField()
     losses = models.IntegerField()
@@ -33,6 +34,10 @@ class Match(models.Model):
         Team, on_delete=models.CASCADE, related_name='local')
     visitor = models.ForeignKey(
         Team, on_delete=models.CASCADE, related_name='visitor')
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True, primary_key=True)
 
 
 class Player(models.Model):
@@ -55,4 +60,5 @@ class Player(models.Model):
 
     plus_minus = models.FloatField()
 
+    tags = models.ManyToManyField(Tag)
     team = models.ForeignKey('Team', on_delete=models.CASCADE)

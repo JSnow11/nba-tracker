@@ -1,7 +1,5 @@
 from tracker.scrapping import scrap_players, scrap_teams
-from tracker.models import Conference, Division, Team, Match, Player
-
-path = "hetrec2011-lastfm-2k"
+from tracker.models import Conference, Division, Team, Match, Player, Tag
 
 
 def populate_database():
@@ -18,13 +16,15 @@ def populate_database():
     populate_divisions(divisions)
     populate_teams(teams)
 
+    print('Populating tags...')
+    populate_tags()
+
     print('Scrapping players...')
     players = scrap_players()
     print("Populating players...")
     populate_players(players)
 
     print('Populating matches...')
-    # todo: matches = scrap_matches()
     print('Finished database population')
     return [len(teams), len(players)]
 
@@ -33,7 +33,13 @@ def delete_tables():
     Conference.objects.all().delete()
     Division.objects.all().delete()
     Team.objects.all().delete()
-    Match.objects.all().delete()
+    Player.objects.all().delete()
+    Tag.objects.all().delete()
+
+
+def populate_tags():
+    for t in ["ANOTADOR", "ASISTENTE", "3PT", "DEFENSOR", "REBOTEADOR", "STAR"]:
+        Tag.objects.create(name=t)
 
 
 def populate_conferences(conferences):
@@ -70,6 +76,29 @@ def populate_teams(teams):
     print("Teams inserted: {}".format(len(create_queue)))
 
 
+def add_player_tags():
+    players = Player.objects.all()
+    for player in players:
+        if(player.pts_per_game > 20 and player.field_goal > 0.4 and player.three_p_ptg > 0.33 and player.ft_ptg > 0.75):
+            player.tags.add("ANOTADOR")
+        if(player.ast_per_game > 8):
+            player.tags.add("ASISTENTE")
+        if(player.three_p_ptg > 0.4):
+            player.tags.add("3PT")
+        if(player.reb_per_game > 10):
+            player.tags.add("REBOTEADOR")
+        if(player.stl_per_game > 3 and player.blk_per_game > 3):
+            player.tags.add("DEFENSOR")
+        if(player.blk_per_game > 5):
+            player.tags.add("TAPONADOR")
+        if(player.stl_per_game > 5):
+            player.tags.add("LADRON")
+        if(player.pts_per_game > 10 and player.ast_per_game > 5 and player.plus_minus > 10):
+            player.tags.add("STAR")
+
+    player.save()
+
+
 def populate_players(players):
     create_queue = []
     for p in players:
@@ -90,4 +119,7 @@ def populate_players(players):
             team=team
         ))
     Player.objects.bulk_create(create_queue)
+
+    add_player_tags()
+
     print("Players inserted: {}".format(len(create_queue)))

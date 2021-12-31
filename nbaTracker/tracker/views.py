@@ -6,7 +6,9 @@ from rest_framework.views import APIView
 from tracker.models import Team, Player
 from tracker.serializers import TeamSerializer, PlayerSerializer
 
-from .populate import populate_database
+from tracker.populate import populate_database
+from tracker.search import index_items
+
 
 # Create your views here.
 
@@ -23,6 +25,20 @@ class PopulateDB(APIView):
         """
         [n_of_teams, n_of_players] = populate_database()
         return Response({"n_of_teams": n_of_teams, "n_of_players": n_of_players})
+
+
+class IndexItems(APIView):
+    """
+    View to index items for search
+    """
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request, format=None):
+        """
+        Triggers items indexing
+        """
+        indexed_teams, indexed_players = index_items()
+        return Response({"indexed_teams": indexed_teams, "indexed_players": indexed_players})
 
 
 class TeamViewSet(viewsets.ModelViewSet):

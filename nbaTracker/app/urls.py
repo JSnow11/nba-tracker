@@ -29,6 +29,7 @@ router.register(r'players', apiViews.PlayerViewSet, 'players')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/populate', apiViews.PopulateDB.as_view()),
+    path('api/index', apiViews.IndexItems.as_view()),
     path('api/', include(router.urls)),
     path('auth/',
          include('rest_framework.urls', namespace='rest_framework')),
