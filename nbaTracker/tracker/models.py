@@ -63,3 +63,31 @@ class Player(models.Model):
 
     tags = models.ManyToManyField(Tag)
     team = models.ForeignKey('Team', on_delete=models.CASCADE)
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        'auth.User', on_delete=models.CASCADE, primary_key=True)
+
+    fav_team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
+    fav_player = models.ForeignKey(
+        Player, on_delete=models.SET_NULL, null=True)
+
+    searched_players = models.ManyToManyField(
+        Player, related_name='searched_players', through="PlayerSearchCounter")
+    searched_teams = models.ManyToManyField(
+        Team, related_name='searched_teams', through="TeamSearchCounter")
+
+
+class TeamSearchCounter(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
+
+    count = models.IntegerField(default=0)
+
+
+class PlayerSearchCounter(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True)
+
+    count = models.IntegerField(default=0)
