@@ -6,7 +6,7 @@ from rest_framework import permissions
 from rest_framework.views import APIView
 
 from tracker.models import Profile, Team, Player
-from tracker.serializers import TeamSerializer, PlayerSerializer
+from tracker.serializers import TeamSerializer, PlayerSerializer, TeamWithRoasterSerializer
 
 from tracker.populate import populate_database
 from tracker.search import index_items, search_players, search_teams
@@ -119,8 +119,8 @@ class SearchTeams(APIView):
             user.searched_players.add(teams[0])
             user.save()
 
-        serializer = TeamSerializer(
-            teams, many=True, context={"request": request})
+        serializer = (TeamWithRoasterSerializer(
+            teams, many=True, context={"request": request}) if len(teams) == 1 else TeamSerializer(teams, many=True, context={"request": request}))
 
         return Response(serializer.data)
 

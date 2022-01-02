@@ -144,3 +144,18 @@ STATICFILES_DIRS = (
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# dev env CORS SETTINGS
+BASEURL = 'http://localhost:8000'
+FE_BASEURL = 'http://localhost:3000'
+
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    BASEURL, FE_BASEURL
+)
+CSRF_TRUSTED_ORIGINS = [
+    BASEURL, FE_BASEURL
+]

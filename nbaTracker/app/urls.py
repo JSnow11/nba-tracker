@@ -29,8 +29,13 @@ router.register(r'players', apiViews.PlayerViewSet, 'players')
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    path('api/auth', apiViews.Log.as_view()),
+    path('api/register', apiViews.Register.as_view()),
+
     path('api/populate', apiViews.PopulateDB.as_view()),
     path('api/index', apiViews.IndexItems.as_view()),
+
+    path('api/recommend/players', apiViews.RecommendPlayers.as_view()),
 
     path('api/search/teams', apiViews.SearchTeams.as_view()),
     path('api/search/players', apiViews.SearchPlayers.as_view()),
