@@ -32,7 +32,7 @@ const StatLeader = (props: {
 }) => {
   return (
     <div className="flex flex-col gap-2 mt-3">
-      <div className="flex items-center justify-between border rounded p-2 border-yellow-600 text-yellow-600">
+      <div className="flex items-center justify-between border rounded p-2 border-yellow-600 text-yellow-600 hover:bg-yellow-200">
         <span>{props.stat}</span>
         <span className="font-bold text-lg">{props.value}</span>
       </div>
@@ -49,7 +49,7 @@ const Card = (props: { player: playerType.Player }) => {
   return (
     <div
       className={
-        "hover:bg-slate-200 cursor-pointer border rounded-md shadow-sm p-2 flex flex-col items-center gap-3 " +
+        "hover:bg-gray-200 cursor-pointer border rounded-md shadow-sm p-2 flex flex-col items-center gap-3 " +
         (isStar ? "border-yellow-600" : "")
       }
       onClick={() => {
@@ -91,6 +91,7 @@ const Details = (props: { player: playerType.Player }) => {
           <img src={props.player.team?.logo_url} className="w-10" alt="logo" />{" "}
           {props.player.team?.abbreviation}
         </span>
+        <br />
 
         <span className="font-bold">Position: </span>
         <span>{props.player.position}</span>

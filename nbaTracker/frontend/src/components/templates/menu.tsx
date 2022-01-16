@@ -49,9 +49,10 @@ const Menu = () => {
   };
 
   return (
-    <Box className="inline-flex flex-col w-2/12 h-screen py-4 justify-between items-center bg-slate-300">
-      <img src={logo} alt="logo" className="w-1/2" />
-      <nav className="w-full h-3/4 items-center">
+    <Box className="inline-flex flex-col w-2/12 h-screen py-4 justify-between items-center bg-gray-200">
+      <img src={logo} alt="logo" className="w-1/3" />{" "}
+      <span className="font-bold">Tracker</span>
+      <nav className="w-full h-3/4 items-center mt-10">
         <Tabs
           value={value}
           onChange={handleChange}
@@ -64,7 +65,7 @@ const Menu = () => {
             icon={<GraphicEqOutlined />}
             href="/standings"
           />
-          <LinkTab label="Search" icon={<Search />} href="/results" />
+          <LinkTab label="Search" icon={<Search />} href="/results/" />
           <LinkTab
             label="Reccomend"
             icon={<StarBorder />}

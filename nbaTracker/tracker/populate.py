@@ -81,7 +81,7 @@ def add_player_tags():
     for player in players:
         if(player.pts_per_game > 20 and player.field_goal > 40 and player.three_p_ptg > 33 and player.ft_ptg > 75):
             player.tags.add("ANOTADOR")
-        if(player.ast_per_game > 8):
+        if(player.ast_per_game > 7):
             player.tags.add("ASISTENTE")
         if(player.three_p_ptg > 35 and player.field_goal > 40 and player.pts_per_game > 15):
             player.tags.add("3PT")
@@ -89,7 +89,7 @@ def add_player_tags():
             player.tags.add("REBOTEADOR")
         if(player.stl_per_game > 3 and player.blk_per_game > 3 and player.reb_per_game > 6):
             player.tags.add("DEFENSOR")
-        if(player.blk_per_game > 3):
+        if(player.blk_per_game > 2.5):
             player.tags.add("TAPONADOR")
         if(player.stl_per_game > 2.5):
             player.tags.add("LADRON")

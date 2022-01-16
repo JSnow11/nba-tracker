@@ -17,7 +17,6 @@ official_nba_url = "https://es.global.nba.com/"
 official_nba_standings_url = "https://www.nba.com/standings?GroupBy=div&Season=2021-22&Section=overall"
 official_nba_stats_url = "https://www.nba.com/stats/players/traditional/?sort=PLAYER_NAME&dir=-1"
 nba_teams_url = official_nba_url + "teamindex/"
-
 official_nba_players_url = "https://www.nba.com/players"
 
 chrome_options = Options()

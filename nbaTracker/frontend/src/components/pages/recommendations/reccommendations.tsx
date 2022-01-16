@@ -50,8 +50,9 @@ const RecommendationsPage = () => {
       <Title title="Players" variant="subtitle1" />
 
       {!playersByStats || playersByStats.length === 0 ? (
-        <div className="w-full border rounded p-8 bg-slate-100 mt-10">
-          <Info /> <p>We still don't know what do you like.</p>{" "}
+        <div className="w-full border rounded p-8 bg-gray-100 mt-10">
+          <Info />
+          <p className="font-bold">We still don't know what you like.</p>{" "}
           <p>
             Search and open some players and teams in order to get some
             recommendations

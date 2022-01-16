@@ -14,7 +14,7 @@ const List = (props: { team: teamType.Team; pos: number }) => {
       onClick={() => {
         navigate(`/results/team/${props.team.abbreviation}`);
       }}
-      className="hover:bg-slate-200 hover:font-bold cursor-pointer flex items-center gap-4 w-full border rounded-sm p-3"
+      className="hover:bg-gray-100 hover:font-bold cursor-pointer flex items-center gap-4 w-full border rounded-sm p-3"
     >
       <span>{"#" + props.pos}</span>
       <img src={props.team.logo_url} className="w-10" alt="logo" />
@@ -31,7 +31,7 @@ const List = (props: { team: teamType.Team; pos: number }) => {
 
 const TeamWinLossIndicator = (props: { wins: number; losses: number }) => {
   return (
-    <div className="flex mx-5 justify-between">
+    <div className="flex mx-5 text-lg justify-between">
       <span className="text-green-900">{props.wins}W</span>/
       <span className="text-red-900">{props.losses}L</span>
     </div>
