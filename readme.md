@@ -2,6 +2,9 @@
 
 Nba Tracker es una aplicación web que basa su contenido en datos de equipos y jugadores de la NBA. Este contenido se obtiene mediante el scrapping de las paginas web oficiales. El contenido es indexado mediante Whoosh y se pueden realizar búsquedas a gran velocidad. Además, en función de la navegación y búsquedas del usuario, se recomiendan ciertos jugadores y equipos que concuerdan con las estadísticas medias de las busquedas de los jugadores o con las etiquetas de los mismos.
 
+![image](https://user-images.githubusercontent.com/47798577/149675737-068fc704-37e9-481c-a56d-63f4a83dc107.png)
+
+
 ## Objetivos
 
 ### Usuarios
@@ -115,7 +118,7 @@ En el caso de los equipos las búsquedas son sencillas y poco relevantes, por no
 
 En el caso de los jugadores, se pueden encontrar jugadores por nombre, nombre/abreviatura de equipo, posicion, dorsal, país, ...
 
-> Véase searchbar en el manual de uso.
+> Véase búsqueda en el manual de uso.
 
 ## Sistema de Recomendación
 
@@ -171,7 +174,7 @@ password: "admin"
 
 #### Dashboard
 
-- http://localhost:8000/standings
+- /standings
 - [click aquí](http://localhost:8000/standings)
 
 1. Pueden verse las estadísticas de los equipos y jugadores.
@@ -180,8 +183,8 @@ password: "admin"
 
 #### Admin
 
-- http://localhost:3000/admin
-- [click aquí](http://localhost:3000/admin)
+- http://localhost:8000/admin
+- [click aquí](http://localhost:8000/admin)
 
 > Nota: si no está logueado, hagalo como administrador.
 
@@ -193,8 +196,8 @@ Nota: la db se ha subido, estos pasos no son obligatorios pero prueban que el po
 
 #### Búsqueda
 
-- http://localhost:3000/404
-- [click aquí](http://localhost:3000/404)
+- /results o /404
+- [click aquí](http://localhost:8000/404)
 
 > Nota: los resultados también son clickables y llevaran a la vista detallada del jugador o equipo.
 
@@ -223,9 +226,17 @@ Nota: la db se ha subido, estos pasos no son obligatorios pero prueban que el po
 
 Tras haber realizado busquedas con un usuario logueado, visite la página de recomendación.
 
-- http://localhost:3000/recommendations
-- [click aquí](http://localhost:3000/recommendations)
+- /recommendations
+- [click aquí](http://localhost:8000/recommendations)
 
 1. Debe visualizar equipos y jugadores recomendados.
 2. Existen, equipos según búsqueda, jugadores según stats y jugadores según etiquetas.
 3. Todos son clickables y llevaran a la vista en detalle.
+
+#### Enrutado
+
+Puesto que la app es enrutada, se ha configurado el enrutado para transportar los parámetros de búsqueda.
+
+1. pruebe búsqueda de equipo por url: [click aquí](http://localhost:8000/results/team/Eastern)
+2. pruebe búsqueda de jugador por url: [click aquí](http://localhost:8000/results/player/Curry)
+3. pruebe vista en detalle por url: [click aquí](http://localhost:8000/results/player/Stephen%20Curry)
