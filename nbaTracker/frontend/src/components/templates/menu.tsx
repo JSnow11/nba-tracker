@@ -3,10 +3,19 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Tooltip } from "@mui/material";
-import { Search, GraphicEqOutlined } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import {
+  Search,
+  GraphicEqOutlined,
+  Logout,
+  StarBorder,
+  AdminPanelSettingsOutlined,
+} from "@mui/icons-material";
+import { Link, useLocation } from "react-router-dom";
 
 import logo from "static/img/logo.png";
+import { IconButton } from "components/01-atoms";
+import { authApi } from "api";
+import { sessionUtils } from "utils";
 
 const LinkTab = (props: {
   label?: string;
@@ -25,12 +34,22 @@ const LinkTab = (props: {
 const Menu = () => {
   const [value, setValue] = React.useState(0);
 
+  const location = useLocation();
+
+  React.useEffect(() => {
+    const tab = location.pathname.split("/")[1];
+    if (tab === "" || tab === "standings") setValue(0);
+    else if (tab === "results") setValue(1);
+    else if (tab === "recommendations") setValue(2);
+    else if (tab === "admin") setValue(3);
+  }, [location]);
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-    <Box className="inline-flex flex-col w-2/12 h-screen pl-4 justify-between items-center bg-slate-300">
+    <Box className="inline-flex flex-col w-2/12 h-screen py-4 justify-between items-center bg-slate-300">
       <img src={logo} alt="logo" className="w-1/2" />
       <nav className="w-full h-3/4 items-center">
         <Tabs
@@ -46,8 +65,23 @@ const Menu = () => {
             href="/standings"
           />
           <LinkTab label="Search" icon={<Search />} href="/results" />
+          <LinkTab
+            label="Reccomend"
+            icon={<StarBorder />}
+            href="/recommendations"
+          />
+          <LinkTab
+            label="Admin"
+            icon={<AdminPanelSettingsOutlined />}
+            href="/admin"
+          />
         </Tabs>
       </nav>
+      <IconButton
+        icon={<Logout />}
+        title="Logout"
+        onClick={() => authApi.logout().finally(() => sessionUtils.logout())}
+      />
     </Box>
   );
 };

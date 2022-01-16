@@ -11,13 +11,13 @@ const authApi = {
   register: (
     username: string,
     password: string,
-    favs: { team: string; player: string }
+    favs?: { team: string; player: string }
   ) =>
     axios.post("/auth/register", {
       username,
       password,
-      fav_team: favs.team,
-      fav_player: favs.player,
+      fav_team: favs?.team,
+      fav_player: favs?.player,
     }),
 };
 

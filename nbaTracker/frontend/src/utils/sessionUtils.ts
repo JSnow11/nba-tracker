@@ -5,11 +5,20 @@ const sessionUtils = {
       ?.find((row) => row.startsWith("token"))
       ?.split("=")?.[1];
   },
-  setToken: (cookie?: string) => {
-    if (cookie) document.cookie = cookie;
+  getAdmin: () => {
+    return document.cookie
+      .split("; ")
+      ?.find((row) => row.startsWith("admin"))
+      ?.split("=")?.[1];
   },
-  removeToken: () => {
-    document.cookie = "token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+  removeCookie: (cookieName: string) => {
+    document.cookie =
+      cookieName + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+  },
+  logout: () => {
+    sessionUtils.removeCookie("token");
+    sessionUtils.removeCookie("admin");
+    window.location.reload();
   },
 };
 

@@ -34,6 +34,9 @@ def get_player_schema():
         team_abbr=TEXT(stored=True),
         team=TEXT(stored=True),
         tags=TEXT(stored=True),
+        country=TEXT(stored=True),
+        pos=TEXT(stored=True),
+        number=TEXT(stored=True),
     )
 
 
@@ -71,7 +74,9 @@ def index_players():
 
     for player in players:
         writer.add_document(name=player.name, team_abbr=player.team.abbreviation,
-                            team=player.team.name, tags="".join([t.name for t in player.tags.all()]))
+                            team=player.team.name, tags="".join(
+                                [t.name for t in player.tags.all()]),
+                            number=str(player.number), country=player.country, pos=player.position)
     writer.commit()
     print("{} players indexed".format(ix.doc_count()))
     return ix.doc_count()
@@ -96,7 +101,7 @@ def search_players(keywords):
     with ix.searcher() as searcher:
         print("Searching for players, keywords: {}".format(keywords))
         query = MultifieldParser(
-            ["name", "team_abbr", "team", "tags"], ix.schema).parse(str(keywords))
+            ["name", "team_abbr", "team", "tags", "country", "pos", "number"], ix.schema).parse(str(keywords))
         results = searcher.search(query, limit=None)
         if(len(results) > 0):
             player_names = [r["name"] for r in results]

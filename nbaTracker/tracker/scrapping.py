@@ -18,7 +18,14 @@ official_nba_standings_url = "https://www.nba.com/standings?GroupBy=div&Season=2
 official_nba_stats_url = "https://www.nba.com/stats/players/traditional/?sort=PLAYER_NAME&dir=-1"
 nba_teams_url = official_nba_url + "teamindex/"
 
+official_nba_players_url = "https://www.nba.com/players"
+
 chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument('window-size=1920x1080')
+chrome_options.add_argument("--incognito")
+chrome_options.add_argument('disable-blink-features=AutomationControlled')
+chrome_options.add_argument('user-agent=Type user agent here')
 
 
 def scrap_div_teams(teams, divisions, division_name, div_table, conference_name):
@@ -59,6 +66,8 @@ def scrap_teams():
 
         print("\nScrapping teams...")
         browser.get(official_nba_standings_url)
+
+        time.sleep(2)
         teams_soup = bs(browser.page_source, "html.parser")
 
         teams = []
@@ -101,9 +110,9 @@ def scrap_players():
     with Chrome(options=chrome_options) as browser:
 
         print("\nScrapping players...")
-
         browser.get(official_nba_stats_url)
 
+        time.sleep(1)
         el = browser.find_element(
             By.CLASS_NAME, 'stats-table-pagination__select')
         for option in el.find_elements(By.TAG_NAME, 'option'):
@@ -157,10 +166,52 @@ def scrap_players():
                 "team": team_abbr
             })
 
+        browser.get(official_nba_players_url)
+        time.sleep(1)
+
+        el = browser.find_element(
+            By.XPATH, '//*[@id="__next"]/div[2]/div[3]/section/div/div[2]/div[1]/div[7]/div/div[3]/div/label/div/select')
+        for option in el.find_elements(By.TAG_NAME, 'option'):
+            if option.text == 'All':
+                option.click()  # select() in earlier versions of webdriver
+                break
+
+        players_soup = bs(browser.page_source, "html.parser")
+
+        player_rows = players_soup.find(
+            "div", class_="MockStatsTable_statsTable__2edDg").find("tbody").find_all("tr")
+
+        for pw in player_rows:
+            player_data = pw.find_all("td")
+
+            player_img = player_data[0].find("img").attrs["src"]
+            player_name_texts = player_data[0].find_all("p", class_="t6")
+            player_name = player_name_texts[0].text.strip(
+            ) + " " + player_name_texts[1].text.strip()
+            player_number = player_data[2].text.strip()
+            player_position = player_data[3].text.strip()
+            player_country = player_data[7].text.strip()
+            team_abbr = player_data[1].text.strip()
+
+            print(team_abbr + " - " + player_name)
+            player_dic_index = next((i for i, p in enumerate(players) if p and p["name"] ==
+                                     player_name and p["team"] == team_abbr), None)
+
+            if(player_dic_index):
+                new_items = {}
+                new_items["img"] = player_img
+                new_items["number"] = player_number
+                new_items["position"] = player_position
+                new_items["country"] = player_country
+
+                new_items.update(players[player_dic_index])
+                players[player_dic_index] = new_items
+
+        print(players)
         return players
 
 
 if __name__ == "__main__":
     print("testing scrapping locally...")
-    scrap_teams()
+    # scrap_teams()
     # scrap_players()

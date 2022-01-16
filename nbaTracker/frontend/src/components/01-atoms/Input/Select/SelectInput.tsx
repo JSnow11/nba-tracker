@@ -9,17 +9,19 @@ const Component = (props: SelectProps) => {
     <Controller
       name={props.name}
       control={props.control}
+      defaultValue={props.defaultValue}
       rules={props.rules}
       render={({ field, fieldState }) => (
         <>
-          <InputLabel id={"label-" + props.name}>{props.name}</InputLabel>
+          <InputLabel id={`select-label-${props.name}`}>
+            {props.name}
+          </InputLabel>
           <Select
-            className="min-w-xs"
-            labelId={"label-" + props.name}
+            labelId={`select-label-${props.name}`}
             label={props.name}
             {...field}
           >
-            {props.options.map((option: Option, index: number) => (
+            {props.options.map((option: Option) => (
               <MenuItem value={option.value}>{option.label}</MenuItem>
             ))}
           </Select>

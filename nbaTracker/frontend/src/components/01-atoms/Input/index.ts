@@ -20,6 +20,7 @@ export type RadioProps = FieldProps & {
 };
 
 export type SelectProps = FieldProps & {
+  defaultValue?: string;
   options: Option[];
 };
 

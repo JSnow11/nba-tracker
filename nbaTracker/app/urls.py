@@ -36,6 +36,7 @@ urlpatterns = [
     path('api/index', apiViews.IndexItems.as_view()),
 
     path('api/recommend/players', apiViews.RecommendPlayers.as_view()),
+    path('api/recommend/teams', apiViews.RecommendTeams.as_view()),
 
     path('api/search/teams', apiViews.SearchTeams.as_view()),
     path('api/search/players', apiViews.SearchPlayers.as_view()),

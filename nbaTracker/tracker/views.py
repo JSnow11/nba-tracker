@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -10,7 +11,7 @@ from tracker.serializers import TeamSerializer, PlayerSerializer, TeamWithRoaste
 
 from tracker.populate import populate_database
 from tracker.search import index_items, search_players, search_teams
-from tracker.recommendations import recommend_players_by_stats, recommend_players_by_tags
+from tracker.recommendations import recommend_players_by_stats, recommend_players_by_tags, recommend_teams_by_search
 
 
 # Create your views here.
@@ -28,14 +29,23 @@ class Log(APIView):
         if not user:
             return Response({"error": "Invalid credentials"}, status=401)
 
-        request.session["user_id"] = user.id
+        token, created = Token.objects.get_or_create(user=user)
+        token.save()
 
-        return Response({"token": user.auth_token.key})
+        response = Response({})
+        response.set_cookie('token', token.key)
+        token.user.is_superuser and response.set_cookie('admin', 'true')
+
+        return response
 
     def delete(self, request):
         request.session["user_id"] = None
 
-        return Response({})
+        response = Response({})
+        response.delete_cookie('token')
+        response.delete_cookie('admin')
+
+        return response
 
 
 class Register(APIView):
@@ -51,8 +61,7 @@ class Register(APIView):
         if not user:
             return Response({"error": "Invalid user"}, status=401)
 
-        profile = Profile(user=user, fav_team=request.data.get(
-            "fav_team"), fav_player=request.data.get("fav_player"))
+        profile = Profile(user=user)
         profile.save()
 
         if not profile:
@@ -65,7 +74,13 @@ class Register(APIView):
         if not user:
             return Response({"error": "Couldn't authenticate"}, status=401)
 
-        return Response({"token": user.auth_token.key})
+        token, created = Token.objects.get_or_create(user=user)
+
+        response = Response({})
+        response.set_cookie('token', token.key)
+        user.token.user.is_superuser and response.set_cookie('admin', 'true')
+
+        return response
 
 
 class PopulateDB(APIView):
@@ -114,10 +129,18 @@ class SearchTeams(APIView):
         else:
             teams = search_teams(query)
 
-        if('user_id' in request.session and len(teams) == 1):
-            user = Profile.objects.get(id=request.session['user_id'])
-            user.searched_players.add(teams[0])
-            user.save()
+        if(request.user and request.user.id and len(teams) == 1):
+            print("ID OF THE USER: " + str(request.user.id))
+            profile = Profile.objects.get(user_id=request.user.id)
+
+            profile.searched_teams.add(teams[0])
+            profile.save()
+
+            counter = profile.teamsearchcounter_set.filter(
+                team_id=teams[0].abbreviation)
+
+            if counter:
+                counter.update(count=counter[0].count + 1)
 
         serializer = (TeamWithRoasterSerializer(
             teams, many=True, context={"request": request}) if len(teams) == 1 else TeamSerializer(teams, many=True, context={"request": request}))
@@ -143,10 +166,18 @@ class SearchPlayers(APIView):
         else:
             players = search_players(query)
 
-        if('user_id' in request.session and len(players) == 1):
-            user = Profile.objects.get(id=request.session['user_id'])
-            user.searched_players.add(players[0])
-            user.save()
+        if(request.user and request.user.id and len(players) == 1):
+            print("ID OF THE USER: " + str(request.user.id))
+            profile = Profile.objects.get(user_id=request.user.id)
+
+            profile.searched_players.add(players[0])
+            profile.save()
+
+            counter = profile.playersearchcounter_set.filter(
+                player_id=players[0].id)
+
+            if counter:
+                counter.update(count=counter[0].count + 1)
 
         serializer = PlayerSerializer(
             players, many=True, context={"request": request})
@@ -158,21 +189,50 @@ class RecommendPlayers(APIView):
     View to recommend players
     """
 
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, format=None):
         """
         Recommend players
         """
-        profile = Profile.objects.get(id=request.session['user_id'])
+        try:
+            profile = Profile.objects.get_or_create(user_id=request.user.id)
+        except Profile.DoesNotExist:
+            return Response({"error": "Profile not found, you need to register"}, status=400)
 
-        players_by_stats = recommend_players_by_stats(profile)
-        players_by_tags = recommend_players_by_tags(profile)
+        players_by_stats = recommend_players_by_stats(profile[0])
+        players_by_tags = recommend_players_by_tags(profile[0])
 
         stat_serializer = PlayerSerializer(
-            players_by_stats, many=True, context={"request": request})
+            [p["player"] for p in players_by_stats], many=True, context={"request": request})
         tag_serializer = PlayerSerializer(
-            players_by_tags, many=True, context={"request": request})
+            [p["player"] for p in players_by_tags], many=True, context={"request": request})
 
         return Response({"by_stat": stat_serializer.data, "by_tags": tag_serializer.data})
+
+
+class RecommendTeams(APIView):
+    """
+    View to recommend teams
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        """
+        Recommend teams
+        """
+        try:
+            profile = Profile.objects.get(user_id=request.user.id)
+        except Profile.DoesNotExist:
+            return Response({"error": "Profile not found, you need to register"}, status=400)
+
+        teams_by_search = recommend_teams_by_search(profile)
+
+        search_serializer = TeamSerializer(
+            teams_by_search, many=True, context={"request": request})
+
+        return Response({"by_search": search_serializer.data})
 
 
 class TeamViewSet(viewsets.ModelViewSet):

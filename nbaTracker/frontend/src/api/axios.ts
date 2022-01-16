@@ -19,8 +19,8 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 403) {
-      sessionUtils.removeToken();
+    if (error.response?.status === 403 || error.response?.status === 401) {
+      sessionUtils.removeCookie("admin");
       window.location.reload();
     }
     return Promise.reject(error);
@@ -33,9 +33,6 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    // todo: handle errors
-    const message = error.response?.data?.message || error.message;
-    console.warn(message);
     return Promise.reject(error);
   }
 );

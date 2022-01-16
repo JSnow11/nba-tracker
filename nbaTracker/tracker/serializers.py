@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from .models import Team, Player
+from .models import Tag, Team, Player
 
 
 class TeamSerializer(serializers.HyperlinkedModelSerializer):
@@ -11,7 +11,7 @@ class TeamSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Team
         fields = ['name', 'logo_url', 'wins', 'losses',
-                  'division', 'conference']
+                  'division', 'conference', 'abbreviation']
 
     def get_division(self, obj):
         return obj.division.name
@@ -49,15 +49,25 @@ class PlayerWithoutTeamSerializer(serializers.HyperlinkedModelSerializer):
                   'blk_per_game']
 
 
+class TagSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['name']
+
+
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
     team = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = Player
-        fields = ['name', 'min_per_game', 'pts_per_game', 'field_goal',
+        fields = ['name', 'number', 'position', 'img_url', 'min_per_game', 'pts_per_game', 'field_goal',
                   'three_p_ptg', 'ft_ptg', 'reb_per_game',
                   'ast_per_game', 'tov_per_game', 'stl_per_game',
-                  'blk_per_game', 'team']
+                  'blk_per_game', 'team', 'plus_minus', 'tags']
 
     def get_team(self, obj):
         return TeamSerializer(obj.team).data
+
+    def get_tags(self, obj):
+        return TagSerializer(obj.tags, many=True, context=self.context).data

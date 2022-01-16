@@ -1,7 +1,9 @@
-import { authApi } from "api";
-import { Button } from "components/01-atoms";
 import React from "react";
+
 import { sessionUtils } from "utils";
+import { authApi } from "api";
+
+import { Button } from "components/01-atoms";
 
 import Page from "../page";
 
@@ -12,7 +14,8 @@ const HomePage = () => {
         title="Logout"
         onClick={() =>
           authApi.logout().finally(() => {
-            sessionUtils.removeToken();
+            sessionUtils.removeCookie("token");
+            sessionUtils.removeCookie("admin");
             window.location.reload();
           })
         }

@@ -16,18 +16,20 @@ import {
   StandingsPage,
   LoginPage,
   ResultsPage,
+  RecommendationsPage,
+  AdminPage,
 } from "components/pages";
 
 export const AppRoutes = () => {
-  const isAuthenticated = sessionUtils?.getToken();
-  React.useEffect(
-    () =>
-      console.log(
-        `rendered, auth: ${isAuthenticated}`,
-        sessionUtils.getToken()
-      ),
-    [isAuthenticated]
-  );
+  const token = sessionUtils.getToken();
+  const admin = sessionUtils.getAdmin();
+
+  console.log(token, admin);
+
+  const isLoggedIn = !!token && token !== "";
+  const isAdmin = !!admin && admin === "true";
+
+  console.log(isLoggedIn, isAdmin);
 
   return (
     <Suspense
@@ -40,17 +42,19 @@ export const AppRoutes = () => {
       <Router>
         <Menu />
         <Routes>
-          {isAuthenticated ? (
-            <>
-              <Route path="/team/:abbr" element={<TeamPage />} />
-              <Route path="/results" element={<ResultsPage />} />
-              <Route path="/standings" element={<StandingsPage />} />
-              <Route path="/404" element={<NotFoundPage />} />
-              <Route path="*" element={<Navigate to="/404" />} />
-            </>
-          ) : (
-            <Route path="*" element={<LoginPage />} />
-          )}
+          <Route path="/standings" element={<StandingsPage />} />
+          <Route path="/team/:abbr" element={<TeamPage />} />
+          <Route path="/results" element={<ResultsPage />} />
+          <Route
+            path="/recommendations"
+            element={isLoggedIn ? <RecommendationsPage /> : <LoginPage />}
+          />
+          <Route
+            path="/admin"
+            element={isLoggedIn && isAdmin ? <AdminPage /> : <LoginPage />}
+          />
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
       </Router>
     </Suspense>

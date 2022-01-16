@@ -5,4 +5,5 @@ export type Team = {
   losses: number;
   division: string;
   conference: string;
+  abbreviation: string;
 };

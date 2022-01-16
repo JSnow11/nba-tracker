@@ -116,6 +116,11 @@ def populate_players(players):
             stl_per_game=p["stl_per_game"],
             blk_per_game=p["blk_per_game"],
             plus_minus=p["plus_minus"],
+            country=p.get("country", "?"),
+            position=p.get("position", "?"),
+            number=p.get("number", "?"),
+            img_url=p.get(
+                "img", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Ei-user.svg/1200px-Ei-user.svg.png"),
             team=team
         ))
     Player.objects.bulk_create(create_queue)

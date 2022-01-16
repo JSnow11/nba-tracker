@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Box } from "@mui/material";
 
@@ -21,6 +21,8 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm<LoginInputs>();
 
+  const [action, setAction] = useState<"login" | "register">("login");
+
   const onSubmitFailed = (e: any) => {
     if (!e.response) {
       setError("password", { type: "manual", message: "Server Error" });
@@ -39,22 +41,31 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
     console.log("Login:", data.username);
-    authApi
-      .login(data.username, data.password)
-      .then((r) => {
-        sessionUtils.setToken(r?.headers["set-cookie"]?.[0]);
-        window.location.reload();
-      })
-      .catch((e) => {
-        onSubmitFailed(e);
-      });
+    if (action === "login")
+      authApi
+        .login(data.username, data.password)
+        .then((r) => {
+          window.location.reload();
+        })
+        .catch((e) => {
+          onSubmitFailed(e);
+        });
+    if (action === "register")
+      authApi
+        .register(data.username, data.password)
+        .then((r) => {
+          window.location.reload();
+        })
+        .catch((e) => {
+          onSubmitFailed(e);
+        });
   };
 
   return (
-    <Page title="Log In">
+    <Page title={action}>
       <Box className="flex flex-col w-60 mx-auto my-4">
         <form
-          className="space-y-5"
+          className="space-y-5 mb-5"
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit(getValues());
@@ -70,8 +81,13 @@ const LoginPage = () => {
             control={control}
             error={errors.password?.message}
           />
-          <Button title="LogIn" type="submit" />
+          <Button title={action} type="submit" />
         </form>
+        <Button
+          variant="text"
+          title={action === "login" ? "Register" : "Login"}
+          onClick={() => setAction(action === "login" ? "register" : "login")}
+        />
       </Box>
     </Page>
   );

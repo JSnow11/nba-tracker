@@ -24,69 +24,52 @@ const searchOptions = [
   },
 ];
 
-const searchTypes = [
-  {
-    value: "search",
-    label: "Search",
-  },
-  {
-    value: "recommend",
-    label: "Recommend",
-  },
-];
-
-const SearchBar = (props: { setResults: any }) => {
+const SearchBar = () => {
   const navigate = useNavigate();
 
   const {
     control,
     getValues,
-    reset,
     formState: { errors },
     setError,
   } = useForm<searchInputs>();
 
-  const onSubmit = (data: any) => {
-    if (data.searchOption === "team")
+  const onSubmit = (data: searchInputs) => {
+    if (data.search_by === "team")
       teamApi
         .searchTeams(data.keywords)
         .then((res) => {
-          props.setResults(res.data);
-          navigate("/results");
+          navigate("/results", { state: { results: { teams: res.data } } });
         })
         .catch((err) => {
           console.log(err);
           setError("keywords", err.message);
         });
-    if (data.searchOption === "player")
+    if (data.search_by === "player")
       playerApi
         .searchPlayers(data.keywords)
         .then((res) => {
-          props.setResults(res.data);
-          navigate("/results");
+          navigate("/results", { state: { results: { players: res.data } } });
         })
         .catch((err) => {
           console.log(err);
           setError("keywords", err.message);
         });
-
-    reset();
   };
 
   return (
     <Box className="w-full inline-flex justify-center">
       <form
         className="flex w-full justify-center"
-        onSubmit={() => onSubmit(getValues())}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(getValues());
+        }}
       >
-        <Input.Select
-          name="search_type"
-          control={control}
-          options={searchTypes}
-        />
         <Input.Select
           name="search_by"
           control={control}
+          defaultValue="team"
           options={searchOptions}
         />
         <Input.Text
