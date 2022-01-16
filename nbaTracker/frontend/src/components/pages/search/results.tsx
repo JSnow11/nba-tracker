@@ -6,7 +6,8 @@ import { Title } from "components/01-atoms";
 import { Player, Team } from "components/03-organisms";
 
 import Page from "../page";
-import { useLocation } from "react-router";
+import { useLocation, useParams } from "react-router";
+import { playerApi, teamApi } from "api";
 
 type Results = {
   teams?: teamType.Team[];
@@ -14,12 +15,32 @@ type Results = {
 };
 
 const ResultsPage = () => {
-  const { state } = useLocation();
+  const { searchby, keywords } = useParams();
+
   const [results, setResults] = React.useState<Results>();
 
   useEffect(() => {
-    state && setResults((state as { results: Results })?.results);
-  }, [state]);
+    console.log(searchby, keywords);
+    if (searchby === "player")
+      playerApi
+        .searchPlayers(keywords || "")
+        .then((res) => {
+          setResults({ players: res.data });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+    if (searchby === "team")
+      teamApi
+        .searchTeams(keywords || "")
+        .then((res) => {
+          setResults({ teams: res.data });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+  }, [searchby, keywords]);
 
   const resultsLength = useMemo(
     () => (results?.players?.length || 0) + (results?.teams?.length || 0),

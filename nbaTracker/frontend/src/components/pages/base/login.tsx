@@ -11,6 +11,7 @@ import Page from "../page";
 type LoginInputs = {
   username: string;
   password: string;
+  email?: string;
 };
 
 const LoginPage = () => {
@@ -18,6 +19,7 @@ const LoginPage = () => {
     control,
     getValues,
     setError,
+    reset,
     formState: { errors },
   } = useForm<LoginInputs>();
 
@@ -52,7 +54,7 @@ const LoginPage = () => {
         });
     if (action === "register")
       authApi
-        .register(data.username, data.password)
+        .register(data.username, data.password, data.email || "")
         .then((r) => {
           window.location.reload();
         })
@@ -76,17 +78,32 @@ const LoginPage = () => {
             control={control}
             error={errors.username?.message}
           />
+          {action === "register" && (
+            <Input.Text
+              control={control}
+              name="email"
+              rules={{
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Invalid email address",
+                },
+              }}
+            />
+          )}
           <Input.Secret
             name="password"
             control={control}
             error={errors.password?.message}
           />
-          <Button title={action} type="submit" />
+          <Button title={action} type="submit" variant="contained" />
         </form>
         <Button
           variant="text"
           title={action === "login" ? "Register" : "Login"}
-          onClick={() => setAction(action === "login" ? "register" : "login")}
+          onClick={() => {
+            reset();
+            setAction(action === "login" ? "register" : "login");
+          }}
         />
       </Box>
     </Page>

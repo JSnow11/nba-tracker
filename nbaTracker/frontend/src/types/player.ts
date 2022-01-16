@@ -23,4 +23,5 @@ export type Player = {
   number: number;
   plus_minus: number;
   position: string;
+  country: string;
 };

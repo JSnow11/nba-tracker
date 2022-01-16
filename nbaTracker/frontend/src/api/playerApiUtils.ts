@@ -5,6 +5,8 @@ const playerApi = {
   getPlayer: (playerName: string) =>
     axios.get(`/search/players?query=${playerName}`),
 
+  getStatLeaders: () => axios.get("/leaders"),
+
   searchPlayers: (searchTerm: string) =>
     axios.get(`/search/players?query=${searchTerm}`),
 };

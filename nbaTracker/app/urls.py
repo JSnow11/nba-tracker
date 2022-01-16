@@ -41,6 +41,8 @@ urlpatterns = [
     path('api/search/teams', apiViews.SearchTeams.as_view()),
     path('api/search/players', apiViews.SearchPlayers.as_view()),
 
+    path('api/leaders', apiViews.StatLeaders.as_view()),
+
     path('api/', include(router.urls)),
     path('auth/',
          include('rest_framework.urls', namespace='rest_framework')),

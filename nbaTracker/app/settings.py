@@ -55,6 +55,11 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.QueryParameterVersioning'
 }
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 

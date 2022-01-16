@@ -44,7 +44,10 @@ export const AppRoutes = () => {
         <Routes>
           <Route path="/standings" element={<StandingsPage />} />
           <Route path="/team/:abbr" element={<TeamPage />} />
-          <Route path="/results" element={<ResultsPage />} />
+          <Route
+            path="/results/:searchby/:keywords"
+            element={<ResultsPage />}
+          />
           <Route
             path="/recommendations"
             element={isLoggedIn ? <RecommendationsPage /> : <LoginPage />}

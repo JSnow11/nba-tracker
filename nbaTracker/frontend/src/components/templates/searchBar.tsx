@@ -4,8 +4,6 @@ import { Search } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import { playerApi, teamApi } from "api";
-
 import { IconButton, Input } from "components/01-atoms";
 
 type searchInputs = {
@@ -31,30 +29,10 @@ const SearchBar = () => {
     control,
     getValues,
     formState: { errors },
-    setError,
   } = useForm<searchInputs>();
 
   const onSubmit = (data: searchInputs) => {
-    if (data.search_by === "team")
-      teamApi
-        .searchTeams(data.keywords)
-        .then((res) => {
-          navigate("/results", { state: { results: { teams: res.data } } });
-        })
-        .catch((err) => {
-          console.log(err);
-          setError("keywords", err.message);
-        });
-    if (data.search_by === "player")
-      playerApi
-        .searchPlayers(data.keywords)
-        .then((res) => {
-          navigate("/results", { state: { results: { players: res.data } } });
-        })
-        .catch((err) => {
-          console.log(err);
-          setError("keywords", err.message);
-        });
+    navigate(`/results/${data.search_by}/${data.keywords}`);
   };
 
   return (

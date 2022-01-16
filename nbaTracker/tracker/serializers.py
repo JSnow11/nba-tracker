@@ -41,12 +41,17 @@ class TeamWithRoasterSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PlayerWithoutTeamSerializer(serializers.HyperlinkedModelSerializer):
+    tags = serializers.SerializerMethodField()
+
     class Meta:
         model = Player
-        fields = ['name', 'min_per_game', 'pts_per_game', 'field_goal',
+        fields = ['name', 'number', 'position', 'country', 'img_url', 'min_per_game', 'pts_per_game', 'field_goal',
                   'three_p_ptg', 'ft_ptg', 'reb_per_game',
                   'ast_per_game', 'tov_per_game', 'stl_per_game',
-                  'blk_per_game']
+                  'blk_per_game', 'plus_minus', 'tags']
+
+    def get_tags(self, obj):
+        return TagSerializer(obj.tags, many=True, context=self.context).data
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
@@ -61,7 +66,7 @@ class PlayerSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['name', 'number', 'position', 'img_url', 'min_per_game', 'pts_per_game', 'field_goal',
+        fields = ['name', 'number', 'position', 'country', 'img_url', 'min_per_game', 'pts_per_game', 'field_goal',
                   'three_p_ptg', 'ft_ptg', 'reb_per_game',
                   'ast_per_game', 'tov_per_game', 'stl_per_game',
                   'blk_per_game', 'team', 'plus_minus', 'tags']

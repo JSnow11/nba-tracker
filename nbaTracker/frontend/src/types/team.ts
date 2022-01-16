@@ -1,3 +1,5 @@
+import { Player } from "./player";
+
 export type Team = {
   name: string;
   logo_url: string;
@@ -6,4 +8,5 @@ export type Team = {
   division: string;
   conference: string;
   abbreviation: string;
+  players?: Player[];
 };

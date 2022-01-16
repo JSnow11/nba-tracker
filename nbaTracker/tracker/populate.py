@@ -79,21 +79,21 @@ def populate_teams(teams):
 def add_player_tags():
     players = Player.objects.all()
     for player in players:
-        if(player.pts_per_game > 20 and player.field_goal > 0.4 and player.three_p_ptg > 0.33 and player.ft_ptg > 0.75):
+        if(player.pts_per_game > 20 and player.field_goal > 40 and player.three_p_ptg > 33 and player.ft_ptg > 75):
             player.tags.add("ANOTADOR")
         if(player.ast_per_game > 8):
             player.tags.add("ASISTENTE")
-        if(player.three_p_ptg > 0.4):
+        if(player.three_p_ptg > 35 and player.field_goal > 40 and player.pts_per_game > 15):
             player.tags.add("3PT")
-        if(player.reb_per_game > 10):
+        if(player.reb_per_game > 8):
             player.tags.add("REBOTEADOR")
-        if(player.stl_per_game > 3 and player.blk_per_game > 3):
+        if(player.stl_per_game > 3 and player.blk_per_game > 3 and player.reb_per_game > 6):
             player.tags.add("DEFENSOR")
-        if(player.blk_per_game > 5):
+        if(player.blk_per_game > 3):
             player.tags.add("TAPONADOR")
-        if(player.stl_per_game > 5):
+        if(player.stl_per_game > 2.5):
             player.tags.add("LADRON")
-        if(player.pts_per_game > 10 and player.ast_per_game > 5 and player.plus_minus > 10):
+        if(player.pts_per_game > 15 and player.ast_per_game > 4 and player.field_goal > 40 and player.plus_minus > 0):
             player.tags.add("STAR")
 
         player.save()

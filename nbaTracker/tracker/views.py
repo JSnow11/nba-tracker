@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -21,13 +22,14 @@ class Log(APIView):
     """
     View to log in/out a user
     """
+    serializer_class = AuthTokenSerializer
 
     def post(self, request):
-        user = authenticate(request=request, username=request.data.get(
-            "username"), password=request.data.get("password"))
+        user_serializer = self.serializer_class(data=request.data,
+                                                context={'request': request})
 
-        if not user:
-            return Response({"error": "Invalid credentials"}, status=401)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.validated_data['user']
 
         token, created = Token.objects.get_or_create(user=user)
         token.save()
@@ -56,6 +58,7 @@ class Register(APIView):
     def post(self, request):
         user = User(username=request.data.get("username"), email=request.data.get(
             "email"), password=request.data.get("password"))
+        user.set_password(user.password)
         user.save()
 
         if not user:
@@ -68,19 +71,7 @@ class Register(APIView):
             user.delete()
             return Response({"error": "Invalid profile data"}, status=401)
 
-        user = authenticate(request=request, username=request.data.get(
-            "username"), password=request.data.get("password"))
-
-        if not user:
-            return Response({"error": "Couldn't authenticate"}, status=401)
-
-        token, created = Token.objects.get_or_create(user=user)
-
-        response = Response({})
-        response.set_cookie('token', token.key)
-        user.token.user.is_superuser and response.set_cookie('admin', 'true')
-
-        return response
+        return Response({})
 
 
 class PopulateDB(APIView):
@@ -233,6 +224,30 @@ class RecommendTeams(APIView):
             teams_by_search, many=True, context={"request": request})
 
         return Response({"by_search": search_serializer.data})
+
+
+class StatLeaders(APIView):
+    """
+    View to get stat leaders
+    """
+
+    def get(self, request, format=None):
+        """
+        Get stat leaders
+        """
+
+        players = Player.objects.all()
+
+        ppg_leader = PlayerSerializer(
+            players.order_by('-pts_per_game')[0]).data
+        apg_leader = PlayerSerializer(
+            players.order_by('-ast_per_game')[0]).data
+        rpg_leader = PlayerSerializer(
+            players.order_by('-reb_per_game')[0]).data
+        blk_leader = PlayerSerializer(
+            players.order_by('-blk_per_game')[0]).data
+
+        return Response({"ppg": ppg_leader, "apg": apg_leader, "rpg": rpg_leader, "blk": blk_leader})
 
 
 class TeamViewSet(viewsets.ModelViewSet):

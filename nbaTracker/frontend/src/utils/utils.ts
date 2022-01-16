@@ -2,27 +2,27 @@ const util = () => {
   return null;
 };
 
-const getTagColor = (tag: string) => {
+const getTagClasses = (tag: string) => {
   console.log(tag);
   switch (tag) {
     case "ANOTADOR":
-      return "red";
+      return "border-red-600 text-red-600";
     case "3PT":
-      return "fuchsia";
+      return "border-fuchsia-600 text-fuchsia-600";
     case "ASISTENTE":
-      return "blue";
+      return "border-blue-600 text-blue-600";
     case "REBOTEADOR":
-      return "slate";
+      return "border-slate-600 text-slate-600";
     case "TAPONADOR":
-      return "lime";
+      return "border-lime-600 text-lime-600";
     case "LADRON":
-      return "orange";
+      return "border-orange-600 text-orange-600";
     case "DEFENSOR":
-      return "green";
+      return "border-green-600 text-green-600";
     case "STAR":
-      return "yellow";
+      return "border-yellow-600 text-yellow-600";
     default:
-      return "gray";
+      return "border-gray-600 text-gray-600";
   }
 };
 
@@ -30,4 +30,4 @@ const parseErrors = (error: any) => {
   return error.response.data?.join(", ");
 };
 
-export { util, parseErrors, getTagColor };
+export { util, parseErrors, getTagClasses };

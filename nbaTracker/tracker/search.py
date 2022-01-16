@@ -74,7 +74,7 @@ def index_players():
 
     for player in players:
         writer.add_document(name=player.name, team_abbr=player.team.abbreviation,
-                            team=player.team.name, tags="".join(
+                            team=player.team.name, tags=" ".join(
                                 [t.name for t in player.tags.all()]),
                             number=str(player.number), country=player.country, pos=player.position)
     writer.commit()

@@ -8,16 +8,11 @@ const authApi = {
     }),
   logout: () => axios.delete("/auth"),
 
-  register: (
-    username: string,
-    password: string,
-    favs?: { team: string; player: string }
-  ) =>
-    axios.post("/auth/register", {
+  register: (username: string, password: string, email: string) =>
+    axios.post("/register", {
       username,
       password,
-      fav_team: favs?.team,
-      fav_player: favs?.player,
+      email,
     }),
 };
 
