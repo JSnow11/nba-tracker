@@ -32,7 +32,7 @@ const StatLeader = (props: {
 }) => {
   return (
     <div className="flex flex-col gap-2 mt-3">
-      <div className="flex items-center justify-between border rounded p-2 border-yellow-600 text-yellow-600 hover:bg-yellow-200">
+      <div className="flex items-center justify-between border rounded p-2 border-yellow-600 text-yellow-600 hover:bg-yellow-100">
         <span>{props.stat}</span>
         <span className="font-bold text-lg">{props.value}</span>
       </div>
