@@ -118,7 +118,7 @@ En el caso de los equipos las búsquedas son sencillas y poco relevantes, por no
 
 En el caso de los jugadores, se pueden encontrar jugadores por nombre, nombre/abreviatura de equipo, posicion, dorsal, país, ...
 
-> Véase searchbar en el manual de uso.
+> Véase búsqueda en el manual de uso.
 
 ## Sistema de Recomendación
 
@@ -238,5 +238,5 @@ Tras haber realizado busquedas con un usuario logueado, visite la página de rec
 Puesto que la app es enrutada, se ha configurado el enrutado para transportar los parámetros de búsqueda.
 
 1. pruebe búsqueda de equipo por url: [click aquí](http://localhost:8000/results/team/Eastern)
-2. pruebe búsqueda de jugador por url: [click aquí](http://localhost:8000/results/team/Curry)
+2. pruebe búsqueda de jugador por url: [click aquí](http://localhost:8000/results/player/Curry)
 3. pruebe vista en detalle por url: [click aquí](http://localhost:8000/results/player/Stephen%20Curry)
